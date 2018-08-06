@@ -50,6 +50,9 @@
   <ItemGroup>
     <Compile Include="REST\DateTimeExtensions.cs" />
     <Compile Include="REST\Entities\BaseRestObject.cs" />
+    <Compile Include="REST\Entities\LimitOrderRequest.cs" />
+    <Compile Include="REST\Entities\OrderObject.cs" />
+    <Compile Include="REST\Entities\Symbols.cs" />
     <Compile Include="REST\Entities\UserObject.cs" />
     <Compile Include="REST\Interfaces\IRestConnector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

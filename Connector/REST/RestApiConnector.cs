@@ -13,12 +13,14 @@ namespace Connector.REST
     {
         private const string USER = "/user";
         private const string LOGOUT = "/user/logout";
+        private const string ORDER = "/order";
 
         private readonly RestClient _client;
         private readonly Uri _endpointUri;
+
         public string ApiKey { get; private set; }
         public string ApiSecret { get; private set; }
-        public long Expires { get; protected set; }
+        public long Expires { get; private set; }
 
         public RestApiConnector(string endpoint, string apiKey, string apiSecret, int expirationPeriod = 10)
         {
@@ -56,12 +58,19 @@ namespace Connector.REST
             }
         }
 
-        public object RegisterOrder()
+        public OrderObject RegisterOrder(LimitOrderRequest order)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return DoRequest<OrderObject>(Method.POST, ORDER, order).Data;
+            }
+            catch (Exception ex)
+            {
+                return new OrderObject { Error = ex.Message, IsSuccess = false };
+            }
         }
 
-        public object CancelOrder()
+        public object CancelOrder(OrderObject order)
         {
             throw new NotImplementedException();
         }
