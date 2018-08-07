@@ -56,21 +56,22 @@ namespace Connector.REST
             }
         }
 
-        public OrderObject RegisterOrder(OrderObject order)
+        public OrderItem RegisterOrder(OrderItem order)
         {
             try
             {
-                var registeredOrderResult = DoRequest<OrderObject>(RestMethod.POST, ORDER, order, true);
-                var registeredOrder = (OrderObject)registeredOrderResult.Data;
+                var registeredOrderResult = DoRequest<OrderItem>(RestMethod.POST, ORDER, order, true);
+                var registeredOrder = (OrderItem)registeredOrderResult.Data;
                 if (registeredOrder == null)
                 {
                     throw new Exception(registeredOrderResult.Error.Message);
                 }
+                registeredOrder.IsSuccess = true;
                 return registeredOrder;
             }
             catch (Exception ex)
             {
-                return new OrderObject { Error = ex.Message, IsSuccess = false };
+                return new OrderItem { Error = ex.Message, IsSuccess = false };
             }
         }
 
@@ -91,7 +92,7 @@ namespace Connector.REST
             throw new NotImplementedException();
         }
 
-        private RestResponse DoRequest<T>(RestMethod method, string resource, object requestData = null, bool json = false)
+        private RestResponse DoRequest<T>(RestMethod method, string resource, object requestData = null, bool json = true)
             where T : BaseRestObject
         {
             var request = new RestRequest
@@ -107,15 +108,13 @@ namespace Connector.REST
                 {"api-signature", CalculateSignature(request.Method, resource, requestData) }
             };
 
-            RestResponse response;
             if (method != RestMethod.GET)
             {
                 var queryDataString = request.IsJson ? JsonConvert.SerializeObject(requestData).ToString() : BuildQueryData(requestData.ToStringDicrionary());
                 var queryDataBytes = Encoding.UTF8.GetBytes(queryDataString);
                 request.Data = queryDataBytes;
             }
-            response = HttpHelper.RawHttpRestQuery<T>(request);
-            return response;
+            return HttpHelper.RawHttpRestQuery<T>(request);
         }
 
         private RestResponse DoRequest(RestMethod method, string resource, object requestData = null, bool json = false)
@@ -132,28 +131,34 @@ namespace Connector.REST
                 {"api-key", ApiKey },
                 {"api-signature", CalculateSignature(request.Method, resource, requestData) }
             };
-
-            RestResponse response;
             if (method != RestMethod.GET)
             {
-                var queryDataString = request.IsJson ? JsonConvert.SerializeObject(requestData).ToString() : BuildQueryData(requestData.ToStringDicrionary());
-                var queryDataBytes = Encoding.UTF8.GetBytes(queryDataString);
-                request.Data = queryDataBytes;
+                if (requestData != null)
+                {
+                    var queryDataString = request.IsJson ? JsonConvert.SerializeObject(requestData).ToString() : BuildQueryData(requestData.ToStringDicrionary());
+                    var queryDataBytes = Encoding.UTF8.GetBytes(queryDataString);
+                    request.Data = queryDataBytes;
+                }
             }
-            response = HttpHelper.RawHttpRestQuery(request);
-            return response;
+            return HttpHelper.RawHttpRestQuery(request);
         }
         private string BuildQueryData(Dictionary<string, string> param)
         {
             if (param == null)
                 return "";
 
-            StringBuilder b = new StringBuilder();
+            var b = new StringBuilder();
             foreach (var item in param)
                 b.Append(string.Format("&{0}={1}", item.Key, WebUtility.UrlEncode(item.Value)));
 
-            try { return b.ToString().Substring(1); }
-            catch (Exception) { return ""; }
+            try
+            {
+                return b.ToString().Substring(1);
+            }
+            catch (Exception)
+            {
+                return "";
+            }
         }
 
         private string CalculateSignature(string method, string resource, object data = null)

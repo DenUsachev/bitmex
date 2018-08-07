@@ -69,9 +69,12 @@ namespace Connector.REST
             try
             {
                 webRequest.ContentType = request.IsJson ? "application/json" : "application/x-www-form-urlencoded";
-                using (var stream = webRequest.GetRequestStream())
+                if (request.Data != null && request.Data.Length > 0)
                 {
-                    stream.Write(request.Data, 0, request.Data.Length);
+                    using (var stream = webRequest.GetRequestStream())
+                    {
+                        stream.Write(request.Data, 0, request.Data.Length);
+                    }
                 }
                 using (WebResponse webResponse = webRequest.GetResponse())
                 using (Stream str = webResponse.GetResponseStream())

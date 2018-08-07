@@ -23,17 +23,18 @@ namespace Console
                 {
                     System.Console.WriteLine("Client connected: {0}, {1}", user.FirstName, user.LastName);
                     System.Console.WriteLine("Trying to set order");
-                    var order = new OrderObject
+                    var order = new OrderItem
                     {
                         side = "Buy",
                         symbol = Symbols.BuySellEth,
                         orderQty = 10,
-                        ordType = "Market"
+                        price = 404.2M,
+                        ordType = "Limit"
                     };
                     var orderSubmitResult = client.RegisterOrder(order);
                     if (orderSubmitResult.IsSuccess)
                     {
-                        System.Console.WriteLine("Order to buy {0} {1} allocated.", order.orderQty, order.symbol);
+                        System.Console.WriteLine("[{0}] {1} {2} by {3:#.00} - order sent.", order.side, order.orderQty, order.symbol, order.price);
                     }
                     else
                     {

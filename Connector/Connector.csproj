@@ -55,7 +55,7 @@
     <Compile Include="RestMethod.cs" />
     <Compile Include="REST\DateTimeExtensions.cs" />
     <Compile Include="REST\Entities\BaseRestObject.cs" />
-    <Compile Include="REST\Entities\OrderObject.cs" />
+    <Compile Include="REST\Entities\OrderItem.cs" />
     <Compile Include="REST\Entities\Symbols.cs" />
     <Compile Include="REST\Entities\UserObject.cs" />
     <Compile Include="REST\HttpHelper.cs" />
