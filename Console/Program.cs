@@ -27,33 +27,40 @@ namespace Console
                     {
                         side = "Buy",
                         symbol = Symbols.BuySellEth,
-                        orderQty = 10,
-                        price = 404.2M,
+                        orderQty = 1,
+                        price = 402.2M,
                         ordType = "Limit"
                     };
+
                     var orderSubmitResult = client.RegisterOrder(order);
                     if (orderSubmitResult.IsSuccess)
                     {
-                        System.Console.WriteLine("[{0}] {1} {2} by {3:#.00} - order sent.", order.side, order.orderQty, order.symbol, order.price);
+                        System.Console.WriteLine("[REST API][{0}] {1} {2} by {3:#.00} - order sent ({4})", order.side, order.orderQty, order.symbol, order.price, orderSubmitResult.orderID);
                     }
                     else
                     {
-                        System.Console.WriteLine("Could not allocate order: {0}", orderSubmitResult.Error);
+                        System.Console.WriteLine("[REST API]Could not allocate order: {0}", orderSubmitResult.Error);
+                    }
+
+                    var cancelOrderResult = client.CancelOrder(orderSubmitResult.orderID);
+                    if (cancelOrderResult.IsSuccess)
+                    {
+                        System.Console.WriteLine("[REST API]Order {0} cancelled.", orderSubmitResult.orderID);
                     }
                     var disconnectionResult = client.Disconnect();
                     if (disconnectionResult.IsSuccess)
                     {
-                        System.Console.WriteLine("Client {0}, {1} disconnected at {2:T}", user.FirstName, user.LastName, DateTime.Now);
+                        System.Console.WriteLine("[REST API]Client {0}, {1} disconnected at {2:T}", user.FirstName, user.LastName, DateTime.Now);
                     }
                 }
                 else
                 {
-                    System.Console.WriteLine("Connection error: {0}", user.Error);
+                    System.Console.WriteLine("[REST API]Connection error: {0}", user.Error);
                 }
             }
             catch (ConfigurationErrorsException e)
             {
-                System.Console.WriteLine("Configuration error: {0} in line {1}", e.Message, e.Line);
+                System.Console.WriteLine("[APP]Configuration error: {0} in line {1}", e.Message, e.Line);
                 System.Console.ReadLine();
             }
 

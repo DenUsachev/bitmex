@@ -79,7 +79,7 @@ namespace Connector.REST
         {
             try
             {
-                return DoRequest(RestMethod.DELETE, ORDER);
+                return DoRequest(RestMethod.DELETE, ORDER, new { orderID = orderId });
             }
             catch (Exception ex)
             {
@@ -117,7 +117,7 @@ namespace Connector.REST
             return HttpHelper.RawHttpRestQuery<T>(request);
         }
 
-        private RestResponse DoRequest(RestMethod method, string resource, object requestData = null, bool json = false)
+        private RestResponse DoRequest(RestMethod method, string resource, object requestData = null, bool json = true)
         {
             var request = new RestRequest
             {
