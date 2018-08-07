@@ -9,7 +9,7 @@ namespace Connector.REST.Interfaces
 
         UserObject Connect();
         RestResponse Disconnect();
-        OrderObject RegisterOrder();
+        OrderObject RegisterOrder(LimitOrderRequest order);
         object CancelOrder(OrderObject order);
         object SubscribeOrderbook();
     }
