@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using Connector.REST;
+using Connector.REST.Entities;
 
 namespace Console
 {
@@ -21,6 +22,23 @@ namespace Console
                 if (user.IsSuccess)
                 {
                     System.Console.WriteLine("Client connected: {0}, {1}", user.FirstName, user.LastName);
+                    System.Console.WriteLine("Trying to set order");
+                    var order = new OrderObject
+                    {
+                        Side = "Buy",
+                        Symbol = Symbols.BuySellEth,
+                        OrderQty = 10,
+                        OrderType = "Market"
+                    };
+                    var orderSubmitResult = client.RegisterOrder(order);
+                    if (orderSubmitResult.IsSuccess)
+                    {
+                        System.Console.WriteLine("Order to buy {0} {1} allocated.", order.OrderQty, order.Symbol);
+                    }
+                    else
+                    {
+                        System.Console.WriteLine("Could not allocate order: {0}.", orderSubmitResult.Error);
+                    }
                     var disconnectionResult = client.Disconnect();
                     if (disconnectionResult.IsSuccess)
                     {

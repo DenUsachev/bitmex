@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Connector</RootNamespace>
     <AssemblyName>Connector</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -58,12 +58,12 @@
   <ItemGroup>
     <Compile Include="REST\DateTimeExtensions.cs" />
     <Compile Include="REST\Entities\BaseRestObject.cs" />
-    <Compile Include="REST\Entities\LimitOrderRequest.cs" />
     <Compile Include="REST\Entities\OrderObject.cs" />
     <Compile Include="REST\Entities\Symbols.cs" />
     <Compile Include="REST\Entities\UserObject.cs" />
     <Compile Include="REST\Interfaces\IRestConnector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="REST\ObjectExtensions.cs" />
     <Compile Include="REST\RestApiConnector.cs" />
     <Compile Include="REST\RestError.cs" />
     <Compile Include="REST\RestResponse.cs" />

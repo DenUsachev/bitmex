@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Connector.REST.Entities;
 using Connector.REST.Interfaces;
+using Microsoft.SqlServer.Server;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -42,7 +43,7 @@ namespace Connector.REST
             }
             catch (Exception ex)
             {
-                return new UserObject { Error = ex.Message, IsSuccess = false };
+                return new UserObject {Error = ex.Message, IsSuccess = false};
             }
         }
 
@@ -54,25 +55,34 @@ namespace Connector.REST
             }
             catch (Exception ex)
             {
-                return new RestResponse { Error = new RestError() { Message = ex.Message } };
+                return new RestResponse {Error = new RestError {Message = ex.Message}};
             }
         }
 
-        public OrderObject RegisterOrder(LimitOrderRequest order)
+        public OrderObject RegisterOrder(OrderObject order)
         {
             try
             {
-                return DoRequest<OrderObject>(Method.POST, ORDER, order).Data;
+                var registeredOrderResult = DoRequest<OrderObject>(Method.POST, ORDER, order);
+                var registeredOrder = (OrderObject) registeredOrderResult.Data;
+                return registeredOrder;
             }
             catch (Exception ex)
             {
-                return new OrderObject { Error = ex.Message, IsSuccess = false };
+                return new OrderObject {Error = ex.Message, IsSuccess = false};
             }
         }
 
-        public object CancelOrder(OrderObject order)
+        public RestResponse CancelOrder(string orderId, string comment = null)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return DoRequest(Method.DELETE, ORDER);
+            }
+            catch (Exception ex)
+            {
+                return new RestResponse {Error = new RestError {Message = ex.Message}};
+            }
         }
 
         public object SubscribeOrderbook()
@@ -80,12 +90,31 @@ namespace Connector.REST
             throw new NotImplementedException();
         }
 
-        private RestResponse DoRequest<T>(Method method, string resource, object requestData = null) where T : BaseRestObject
+        private RestResponse DoRequest<T>(Method method, string resource, object requestData = null, bool json = false)
+            where T : BaseRestObject
         {
-            var req = new RestRequest { Method = method, Resource = resource };
-            if (requestData != null && (method == Method.POST || method == Method.PUT || method == Method.PATCH || method == Method.DELETE))
-                req.AddJsonBody(requestData);
-
+            var req = new RestRequest {Method = method, Resource = resource};
+            if (requestData != null &&
+                (method == Method.POST
+                 || method == Method.PUT
+                 || method == Method.PATCH
+                 || method == Method.DELETE))
+            {
+                if (json)
+                {
+                    req.AddJsonBody(requestData);
+                }
+                else
+                {
+                    req.AddHeader("ContentType", "application/x-www-form-urlencoded");
+                    var dataDicrionary = requestData.ToStringDicrionary();
+                    foreach (var param in dataDicrionary)
+                    {
+                        req.AddParameter(param.Key, param.Value);
+                    }
+                }
+            }
+            
             req.AddHeader("api-expires", Expires.ToString());
             req.AddHeader("api-key", ApiKey);
             req.AddHeader("api-signature", CalculateSignature(method, resource, requestData));
@@ -105,15 +134,34 @@ namespace Connector.REST
                     IsSuccess = true
                 };
             }
+
             res.StatusCode = httpResponse.StatusCode;
             return res;
         }
 
-        private RestResponse DoRequest(Method method, string resource, object requestData = null)
+        private RestResponse DoRequest(Method method, string resource, object requestData = null, bool json = false)
         {
-            var req = new RestRequest { Method = method, Resource = resource };
-            if (requestData != null && (method == Method.POST || method == Method.PUT || method == Method.PATCH || method == Method.DELETE))
-                req.AddJsonBody(requestData);
+            var req = new RestRequest {Method = method, Resource = resource};
+            if (requestData != null &&
+                (method == Method.POST
+                 || method == Method.PUT
+                 || method == Method.PATCH
+                 || method == Method.DELETE))
+            {
+                if (json)
+                {
+                    req.AddJsonBody(requestData);
+                }
+                else
+                {
+                    req.AddHeader("ContentType", "application/x-www-form-urlencoded");
+                    var dataDicrionary = requestData.ToStringDicrionary();
+                    foreach (var param in dataDicrionary)
+                    {
+                        req.AddQueryParameter(param.Key, param.Value);
+                    }
+                }
+            }
 
             req.AddHeader("api-expires", Expires.ToString());
             req.AddHeader("api-key", ApiKey);
@@ -134,6 +182,7 @@ namespace Connector.REST
                     IsSuccess = true
                 };
             }
+
             res.StatusCode = httpResponse.StatusCode;
             return res;
         }
@@ -149,7 +198,8 @@ namespace Connector.REST
 
             if (data != null)
             {
-                sb.Append(JsonConvert.SerializeObject(data));
+                var requestString = JsonConvert.SerializeObject(data);
+                sb.Append(requestString);
             }
 
             using (var hmac = new HMACSHA256(Encoding.ASCII.GetBytes(ApiSecret)))
