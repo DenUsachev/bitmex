@@ -66,7 +66,7 @@
     <Compile Include="REST\RestError.cs" />
     <Compile Include="REST\RestRequest.cs" />
     <Compile Include="REST\RestResponse.cs" />
-    <Compile Include="Tests\ConnectionTest.cs" />
+    <Compile Include="Tests\ConnectorTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WS\" />
