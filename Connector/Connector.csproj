@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Connector</RootNamespace>
     <AssemblyName>Connector</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -40,10 +40,6 @@
       <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.105.2.3\lib\net451\RestSharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\..\..\..\..\..\Library\Frameworks\Mono.framework\Versions\5.10.1\lib\mono\4.5.1-api\System.Configuration.dll</HintPath>
@@ -56,16 +52,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RestMethod.cs" />
     <Compile Include="REST\DateTimeExtensions.cs" />
     <Compile Include="REST\Entities\BaseRestObject.cs" />
     <Compile Include="REST\Entities\OrderObject.cs" />
     <Compile Include="REST\Entities\Symbols.cs" />
     <Compile Include="REST\Entities\UserObject.cs" />
+    <Compile Include="REST\HttpHelper.cs" />
     <Compile Include="REST\Interfaces\IRestConnector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="REST\ObjectExtensions.cs" />
     <Compile Include="REST\RestApiConnector.cs" />
     <Compile Include="REST\RestError.cs" />
+    <Compile Include="REST\RestRequest.cs" />
     <Compile Include="REST\RestResponse.cs" />
     <Compile Include="Tests\ConnectionTest.cs" />
   </ItemGroup>
@@ -74,6 +73,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

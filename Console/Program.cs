@@ -25,19 +25,19 @@ namespace Console
                     System.Console.WriteLine("Trying to set order");
                     var order = new OrderObject
                     {
-                        Side = "Buy",
-                        Symbol = Symbols.BuySellEth,
-                        OrderQty = 10,
-                        OrderType = "Market"
+                        side = "Buy",
+                        symbol = Symbols.BuySellEth,
+                        orderQty = 10,
+                        ordType = "Market"
                     };
                     var orderSubmitResult = client.RegisterOrder(order);
                     if (orderSubmitResult.IsSuccess)
                     {
-                        System.Console.WriteLine("Order to buy {0} {1} allocated.", order.OrderQty, order.Symbol);
+                        System.Console.WriteLine("Order to buy {0} {1} allocated.", order.orderQty, order.symbol);
                     }
                     else
                     {
-                        System.Console.WriteLine("Could not allocate order: {0}.", orderSubmitResult.Error);
+                        System.Console.WriteLine("Could not allocate order: {0}", orderSubmitResult.Error);
                     }
                     var disconnectionResult = client.Disconnect();
                     if (disconnectionResult.IsSuccess)

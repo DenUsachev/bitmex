@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using Connector.REST.Entities;
 using Connector.REST.Interfaces;
-using Microsoft.SqlServer.Server;
 using Newtonsoft.Json;
-using RestSharp;
 
 namespace Connector.REST
 {
@@ -16,7 +15,6 @@ namespace Connector.REST
         private const string LOGOUT = "/user/logout";
         private const string ORDER = "/order";
 
-        private readonly RestClient _client;
         private readonly Uri _endpointUri;
 
         public string ApiKey { get; private set; }
@@ -25,7 +23,6 @@ namespace Connector.REST
 
         public RestApiConnector(string endpoint, string apiKey, string apiSecret, int expirationPeriod = 10)
         {
-            _client = new RestClient(endpoint);
             _endpointUri = new Uri(endpoint);
             ApiKey = apiKey;
             ApiSecret = apiSecret;
@@ -36,14 +33,14 @@ namespace Connector.REST
         {
             try
             {
-                var result = DoRequest<UserObject>(Method.GET, USER);
+                var result = DoRequest<UserObject>(RestMethod.GET, USER);
                 UserObject userObject = result.Data;
                 userObject.IsSuccess = result.IsSuccess;
                 return userObject;
             }
             catch (Exception ex)
             {
-                return new UserObject {Error = ex.Message, IsSuccess = false};
+                return new UserObject { Error = ex.Message, IsSuccess = false };
             }
         }
 
@@ -51,11 +48,11 @@ namespace Connector.REST
         {
             try
             {
-                return DoRequest(Method.POST, LOGOUT);
+                return DoRequest(RestMethod.POST, LOGOUT);
             }
             catch (Exception ex)
             {
-                return new RestResponse {Error = new RestError {Message = ex.Message}};
+                return new RestResponse { Error = new RestError { Message = ex.Message } };
             }
         }
 
@@ -63,13 +60,17 @@ namespace Connector.REST
         {
             try
             {
-                var registeredOrderResult = DoRequest<OrderObject>(Method.POST, ORDER, order);
-                var registeredOrder = (OrderObject) registeredOrderResult.Data;
+                var registeredOrderResult = DoRequest<OrderObject>(RestMethod.POST, ORDER, order, true);
+                var registeredOrder = (OrderObject)registeredOrderResult.Data;
+                if (registeredOrder == null)
+                {
+                    throw new Exception(registeredOrderResult.Error.Message);
+                }
                 return registeredOrder;
             }
             catch (Exception ex)
             {
-                return new OrderObject {Error = ex.Message, IsSuccess = false};
+                return new OrderObject { Error = ex.Message, IsSuccess = false };
             }
         }
 
@@ -77,11 +78,11 @@ namespace Connector.REST
         {
             try
             {
-                return DoRequest(Method.DELETE, ORDER);
+                return DoRequest(RestMethod.DELETE, ORDER);
             }
             catch (Exception ex)
             {
-                return new RestResponse {Error = new RestError {Message = ex.Message}};
+                return new RestResponse { Error = new RestError { Message = ex.Message } };
             }
         }
 
@@ -90,104 +91,72 @@ namespace Connector.REST
             throw new NotImplementedException();
         }
 
-        private RestResponse DoRequest<T>(Method method, string resource, object requestData = null, bool json = false)
+        private RestResponse DoRequest<T>(RestMethod method, string resource, object requestData = null, bool json = false)
             where T : BaseRestObject
         {
-            var req = new RestRequest {Method = method, Resource = resource};
-            if (requestData != null &&
-                (method == Method.POST
-                 || method == Method.PUT
-                 || method == Method.PATCH
-                 || method == Method.DELETE))
+            var request = new RestRequest
             {
-                if (json)
-                {
-                    req.AddJsonBody(requestData);
-                }
-                else
-                {
-                    req.AddHeader("ContentType", "application/x-www-form-urlencoded");
-                    var dataDicrionary = requestData.ToStringDicrionary();
-                    foreach (var param in dataDicrionary)
-                    {
-                        req.AddParameter(param.Key, param.Value);
-                    }
-                }
-            }
-            
-            req.AddHeader("api-expires", Expires.ToString());
-            req.AddHeader("api-key", ApiKey);
-            req.AddHeader("api-signature", CalculateSignature(method, resource, requestData));
-            var httpResponse = _client.Execute(req);
+                IsJson = json,
+                Method = Enum.GetName(typeof(RestMethod), method),
+                Url = $"{_endpointUri}{resource}",
+            };
+            request.Headers = new Dictionary<string, string>
+            {
+                {"api-expires", Expires.ToString() },
+                {"api-key", ApiKey },
+                {"api-signature", CalculateSignature(request.Method, resource, requestData) }
+            };
 
-            RestResponse res;
-            if (httpResponse.StatusCode == HttpStatusCode.BadRequest)
+            RestResponse response;
+            if (method != RestMethod.GET)
             {
-                res = JsonConvert.DeserializeObject<RestResponse>(httpResponse.Content);
-                res.IsSuccess = false;
+                var queryDataString = request.IsJson ? JsonConvert.SerializeObject(requestData).ToString() : BuildQueryData(requestData.ToStringDicrionary());
+                var queryDataBytes = Encoding.UTF8.GetBytes(queryDataString);
+                request.Data = queryDataBytes;
             }
-            else
-            {
-                res = new RestResponse
-                {
-                    Data = JsonConvert.DeserializeObject<T>(httpResponse.Content),
-                    IsSuccess = true
-                };
-            }
-
-            res.StatusCode = httpResponse.StatusCode;
-            return res;
+            response = HttpHelper.RawHttpRestQuery<T>(request);
+            return response;
         }
 
-        private RestResponse DoRequest(Method method, string resource, object requestData = null, bool json = false)
+        private RestResponse DoRequest(RestMethod method, string resource, object requestData = null, bool json = false)
         {
-            var req = new RestRequest {Method = method, Resource = resource};
-            if (requestData != null &&
-                (method == Method.POST
-                 || method == Method.PUT
-                 || method == Method.PATCH
-                 || method == Method.DELETE))
+            var request = new RestRequest
             {
-                if (json)
-                {
-                    req.AddJsonBody(requestData);
-                }
-                else
-                {
-                    req.AddHeader("ContentType", "application/x-www-form-urlencoded");
-                    var dataDicrionary = requestData.ToStringDicrionary();
-                    foreach (var param in dataDicrionary)
-                    {
-                        req.AddQueryParameter(param.Key, param.Value);
-                    }
-                }
-            }
-
-            req.AddHeader("api-expires", Expires.ToString());
-            req.AddHeader("api-key", ApiKey);
-            req.AddHeader("api-signature", CalculateSignature(method, resource, requestData));
-            var httpResponse = _client.Execute(req);
-
-            RestResponse res;
-            if (httpResponse.StatusCode == HttpStatusCode.BadRequest)
+                IsJson = json,
+                Method = Enum.GetName(typeof(RestMethod), method),
+                Url = $"{_endpointUri}{resource}",
+            };
+            request.Headers = new Dictionary<string, string>
             {
-                res = JsonConvert.DeserializeObject<RestResponse>(httpResponse.Content);
-                res.IsSuccess = false;
-            }
-            else
-            {
-                res = new RestResponse
-                {
-                    Data = JsonConvert.DeserializeObject(httpResponse.Content),
-                    IsSuccess = true
-                };
-            }
+                {"api-expires", Expires.ToString() },
+                {"api-key", ApiKey },
+                {"api-signature", CalculateSignature(request.Method, resource, requestData) }
+            };
 
-            res.StatusCode = httpResponse.StatusCode;
-            return res;
+            RestResponse response;
+            if (method != RestMethod.GET)
+            {
+                var queryDataString = request.IsJson ? JsonConvert.SerializeObject(requestData).ToString() : BuildQueryData(requestData.ToStringDicrionary());
+                var queryDataBytes = Encoding.UTF8.GetBytes(queryDataString);
+                request.Data = queryDataBytes;
+            }
+            response = HttpHelper.RawHttpRestQuery(request);
+            return response;
+        }
+        private string BuildQueryData(Dictionary<string, string> param)
+        {
+            if (param == null)
+                return "";
+
+            StringBuilder b = new StringBuilder();
+            foreach (var item in param)
+                b.Append(string.Format("&{0}={1}", item.Key, WebUtility.UrlEncode(item.Value)));
+
+            try { return b.ToString().Substring(1); }
+            catch (Exception) { return ""; }
         }
 
-        private string CalculateSignature(Method method, string resource, object data = null)
+        private string CalculateSignature(string method, string resource, object data = null)
         {
             var sb = new StringBuilder();
             sb
@@ -201,10 +170,11 @@ namespace Connector.REST
                 var requestString = JsonConvert.SerializeObject(data);
                 sb.Append(requestString);
             }
+            var tmp = sb.ToString();
 
             using (var hmac = new HMACSHA256(Encoding.ASCII.GetBytes(ApiSecret)))
             {
-                var hash = hmac.ComputeHash(Encoding.ASCII.GetBytes(sb.ToString()));
+                var hash = hmac.ComputeHash(Encoding.ASCII.GetBytes(tmp));
                 var sign = BitConverter.ToString(hash).Replace("-", "");
                 return sign;
             }

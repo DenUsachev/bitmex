@@ -1,27 +1,15 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Connector.REST.Entities
 {
     public class OrderObject : BaseRestObject
     {
-        public string Symbol { get; set; }
-        
-        public string Side { get; set; }
-        
-        public decimal OrderQty { get; set; }
-        
-        [JsonProperty("ordType")]
-        public string  OrderType { get; set; }
-        
-        public long Timestamp { get; }
-        
-        public long TransactTime { get; }
+        public string symbol { get; set; }
 
-        public OrderObject()
-        {
-            Timestamp = DateTime.UtcNow.ToUnixTime();
-            TransactTime = Timestamp;
-        }
+        public string side { get; set; }
+
+        public decimal orderQty { get; set; }
+
+        public string ordType { get; set; }
     }
 }
