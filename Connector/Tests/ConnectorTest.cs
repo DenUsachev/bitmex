@@ -26,7 +26,7 @@ namespace Connector.Tests
         }
 
         [Order(1), TestCase("iIFvva629YnJ1LmjEflRfhWA", "QKWRrSRXSBF2sLneIHG118MiBZxAmP5m3L0tel_zYFdPIOvf")]
-        public void ConnectTest(string key, string secret)
+        public void Connect(string key, string secret)
         {
             _connector = new RestApiConnector(BitmexUrl, key, secret);
             var user = _connector.Connect();
@@ -35,7 +35,7 @@ namespace Connector.Tests
         }
 
         [Order(2), Test]
-        public void PlaceOrderTest()
+        public void PlaceOrder()
         {
             var result = _connector.RegisterOrder(_order);
             Assert.True(result.IsSuccess, "Order allocation failed");
@@ -48,14 +48,14 @@ namespace Connector.Tests
         }
 
         [Order(3), Test]
-        public void DeleteOrderTest()
+        public void CancelOrder()
         {
             var result = _connector.CancelOrder(_order.orderID);
             Assert.True(result.IsSuccess, "Order cancellation failed");
         }
 
         [Order(4), Test]
-        public void DisconnectTest()
+        public void Disconnect()
         {
             var response = _connector.Disconnect();
             Assert.IsTrue(response.StatusCode == HttpStatusCode.NoContent);
