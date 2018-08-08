@@ -23,7 +23,7 @@ namespace Connector.Tests
             };
         }
 
-        [Order(1), TestCase("iIFvva629YnJ1LmjEflRfhWA", "QKWRrSRXSBF2sLneIHG118MiBZxAmP5m3L0tel_zYFdPIOvf")]
+        [Order(1), TestCase("Z3So8fRWLaejVhuqKJikSj8B", "malgMjihESAAJrVtzs96ydD1f_m4zoS6YK_vwFFRLitQZzGa")]
         public void Connect(string key, string secret)
         {
             _connector = new RestApiConnector(BITMEX_URL, key, secret);
@@ -32,7 +32,7 @@ namespace Connector.Tests
             Assert.IsNotNull(user.Id, "User id was not fetched");
         }
 
-        [Order(2), TestCase("iIFvva629YnJ1LmjEflRfhWA", "QKWRrSRXSBF2sLneIHG118MiBZxAmP5m3L0tel_zYFdPIOvf")]
+        [Order(2), TestCase("Z3So8fRWLaejVhuqKJikSj8B", "malgMjihESAAJrVtzs96ydD1f_m4zoS6YK_vwFFRLitQZzGa")]
         public void PlaceOrder(string key, string secret)
         {
             _connector = new RestApiConnector(BITMEX_URL, key, secret);
@@ -46,7 +46,7 @@ namespace Connector.Tests
             _order = result;
         }
 
-        [Order(3), TestCase("iIFvva629YnJ1LmjEflRfhWA", "QKWRrSRXSBF2sLneIHG118MiBZxAmP5m3L0tel_zYFdPIOvf")]
+        [Order(3), TestCase("Z3So8fRWLaejVhuqKJikSj8B", "malgMjihESAAJrVtzs96ydD1f_m4zoS6YK_vwFFRLitQZzGa")]
         public void CancelOrder(string key, string secret)
         {
             _connector = new RestApiConnector(BITMEX_URL, key, secret);
