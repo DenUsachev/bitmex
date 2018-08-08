@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Connector.REST
+namespace Connector.Extensions
 {
     public static class DateTimeExtensions
     {

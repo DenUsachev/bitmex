@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Connector.REST
+namespace Connector.REST.Entities
 {
     public class RestRequest
     {

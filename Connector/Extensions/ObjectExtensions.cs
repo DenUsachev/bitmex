@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Connector.REST
+namespace Connector.Extensions
 {
     public static class ObjectExtensions
     {

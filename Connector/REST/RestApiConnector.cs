@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using Connector.Extensions;
 using Connector.REST.Entities;
 using Connector.REST.Interfaces;
 using Newtonsoft.Json;

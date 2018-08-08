@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Connector.REST
+namespace Connector.REST.Entities
 {
     public class RestResponse
     {
