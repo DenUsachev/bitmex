@@ -1,12 +1,38 @@
-﻿using Connector.REST.Entities;
+﻿using System;
+using Connector.REST.Entities;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Connector.REST
 {
     public static class HttpHelper
     {
+        public static string CalculateSignature(Uri endpointUri, long expires, string secret, string method, string resource, object data = null)
+        {
+            var sb = new StringBuilder();
+            sb
+                .Append(method)
+                .Append(endpointUri.LocalPath)
+                .Append(resource)
+                .Append(expires);
+
+            if (data != null)
+            {
+                var requestString = JsonConvert.SerializeObject(data);
+                sb.Append(requestString);
+            }
+            var tmp = sb.ToString();
+            using (var hmac = new HMACSHA256(Encoding.ASCII.GetBytes(secret)))
+            {
+                var hash = hmac.ComputeHash(Encoding.ASCII.GetBytes(tmp));
+                var sign = BitConverter.ToString(hash).Replace("-", "");
+                return sign;
+            }
+        }
+
         public static RestResponse RawHttpRestQuery<T>(RestRequest request)
             where T : BaseRestObject
         {
@@ -15,7 +41,7 @@ namespace Connector.REST
             webRequest.Method = request.Method;
             foreach (var hdr in request.Headers)
             {
-                webRequest.Headers.Add(hdr.Key, hdr.Value.ToString());
+                webRequest.Headers.Add(hdr.Key, hdr.Value);
             }
             try
             {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Security.Cryptography;
 using System.Text;
 using Connector.Extensions;
 using Connector.REST.Entities;
@@ -35,6 +34,10 @@ namespace Connector.REST
             try
             {
                 var result = DoRequest<UserObject>(RestMethod.GET, USER);
+                if (!result.IsSuccess)
+                {
+                    throw new Exception(result.Error.Message);
+                }
                 UserObject userObject = result.Data;
                 userObject.IsSuccess = result.IsSuccess;
                 return userObject;
@@ -61,7 +64,7 @@ namespace Connector.REST
         {
             try
             {
-                var registeredOrderResult = DoRequest<OrderItem>(RestMethod.POST, ORDER, order, true);
+                var registeredOrderResult = DoRequest<OrderItem>(RestMethod.POST, ORDER, order);
                 var registeredOrder = (OrderItem)registeredOrderResult.Data;
                 if (registeredOrder == null)
                 {
@@ -100,18 +103,18 @@ namespace Connector.REST
             {
                 IsJson = json,
                 Method = Enum.GetName(typeof(RestMethod), method),
-                Url = $"{_endpointUri}{resource}",
+                Url = string.Format("{0},{1}", _endpointUri, resource)
             };
             request.Headers = new Dictionary<string, string>
             {
                 {"api-expires", Expires.ToString() },
                 {"api-key", ApiKey },
-                {"api-signature", CalculateSignature(request.Method, resource, requestData) }
+                {"api-signature", HttpHelper.CalculateSignature(_endpointUri, Expires,ApiSecret, request.Method, resource, requestData) }
             };
 
             if (method != RestMethod.GET)
             {
-                var queryDataString = request.IsJson ? JsonConvert.SerializeObject(requestData).ToString() : BuildQueryData(requestData.ToStringDicrionary());
+                var queryDataString = request.IsJson ? JsonConvert.SerializeObject(requestData) : BuildQueryData(requestData.ToStringDicrionary());
                 var queryDataBytes = Encoding.UTF8.GetBytes(queryDataString);
                 request.Data = queryDataBytes;
             }
@@ -124,25 +127,26 @@ namespace Connector.REST
             {
                 IsJson = json,
                 Method = Enum.GetName(typeof(RestMethod), method),
-                Url = $"{_endpointUri}{resource}",
+                Url = string.Format("{0},{1}", _endpointUri, resource)
             };
             request.Headers = new Dictionary<string, string>
             {
                 {"api-expires", Expires.ToString() },
                 {"api-key", ApiKey },
-                {"api-signature", CalculateSignature(request.Method, resource, requestData) }
+                {"api-signature", HttpHelper.CalculateSignature(_endpointUri, Expires, ApiSecret, request.Method, resource, requestData) }
             };
             if (method != RestMethod.GET)
             {
                 if (requestData != null)
                 {
-                    var queryDataString = request.IsJson ? JsonConvert.SerializeObject(requestData).ToString() : BuildQueryData(requestData.ToStringDicrionary());
+                    var queryDataString = request.IsJson ? JsonConvert.SerializeObject(requestData) : BuildQueryData(requestData.ToStringDicrionary());
                     var queryDataBytes = Encoding.UTF8.GetBytes(queryDataString);
                     request.Data = queryDataBytes;
                 }
             }
             return HttpHelper.RawHttpRestQuery(request);
         }
+
         private string BuildQueryData(Dictionary<string, string> param)
         {
             if (param == null)
@@ -162,28 +166,6 @@ namespace Connector.REST
             }
         }
 
-        private string CalculateSignature(string method, string resource, object data = null)
-        {
-            var sb = new StringBuilder();
-            sb
-                .Append(method)
-                .Append(_endpointUri.LocalPath)
-                .Append(resource)
-                .Append(Expires);
 
-            if (data != null)
-            {
-                var requestString = JsonConvert.SerializeObject(data);
-                sb.Append(requestString);
-            }
-            var tmp = sb.ToString();
-
-            using (var hmac = new HMACSHA256(Encoding.ASCII.GetBytes(ApiSecret)))
-            {
-                var hash = hmac.ComputeHash(Encoding.ASCII.GetBytes(tmp));
-                var sign = BitConverter.ToString(hash).Replace("-", "");
-                return sign;
-            }
-        }
     }
 }

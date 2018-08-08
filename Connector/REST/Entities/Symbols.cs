@@ -2,8 +2,8 @@
 {
     public static class Symbols
     {
-        public const string BuySellEth = "ETHUSD";
-        public const string BuySellBitcoin = "BTCUSD";
-        public const string BuySellRipple = "XRPUSD";
+        public const string Eth = "ETHUSD";
+        public const string Bitcoin = "BTCUSD";
+        public const string Ripple = "XRPUSD";
     }
 }

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Connector</RootNamespace>
     <AssemblyName>Connector</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -70,6 +70,10 @@
     <Compile Include="REST\Entities\RestRequest.cs" />
     <Compile Include="REST\Entities\RestResponse.cs" />
     <Compile Include="Tests\ConnectorTest.cs" />
+    <Compile Include="WS\Entities\ResponseBase.cs" />
+    <Compile Include="WS\Entities\TradeResponse.cs" />
+    <Compile Include="WS\Entities\InfoResponse.cs" />
+    <Compile Include="WS\Entities\Trade.cs" />
     <Compile Include="WS\WebSocketCommand.cs" />
     <Compile Include="WS\WebSocketFeed.cs" />
   </ItemGroup>
