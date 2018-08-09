@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Connector.Extensions;
 using Connector.REST;
 using Connector.WS.Entities;
 using Newtonsoft.Json;
@@ -10,9 +11,9 @@ namespace Connector.WS
     public class WebSocketFeed : IDisposable
     {
         private WebSocket _webSocket;
-        private const long EXPIRES = 10;
-        private const string FEED_RESOURCE = "/realtime";
-
+        private long _expires;
+        private const string FEED_RESOURCE = "realtime";
+        private const int EXPIRATION_PERIOD = 10;
         public string ConnectionString { get; set; }
 
         public event EventHandler<InfoResponse> NewInfoMessage;
@@ -27,14 +28,16 @@ namespace Connector.WS
         {
             try
             {
+                _expires = DateTime.Now.ToUnixTime() + EXPIRATION_PERIOD;
+
                 var endpointUrl = new Uri(ConnectionString);
-                var sign = HttpHelper.CalculateSignature(endpointUrl, EXPIRES, secret, "GET", FEED_RESOURCE);
-                //var authrorizedUrl = string.Format("{0}?api-expires={1}&api-signature={2}&api-key={3}", endpointUrl, EXPIRES, sign, key);
-                var authrorizedUrl = string.Format("{0}{1}", ConnectionString, FEED_RESOURCE);
+                var sign = HttpHelper.CalculateSignature(endpointUrl, _expires, secret, "GET", FEED_RESOURCE);
+                var authrorizedUrl = string.Format("{0}realtime?api-expires={1}&api-signature={2}&api-key={3}", endpointUrl, _expires, sign, key);
+                //var authrorizedUrl = string.Format("{0}{1}", ConnectionString, FEED_RESOURCE);
                 _webSocket = new WebSocket(authrorizedUrl) { Log = { Level = LogLevel.Debug } };
                 _webSocket.OnMessage += MessageReceived;
                 _webSocket.Connect();
-                Auth(key, sign);
+                //Auth(key, sign);
 
                 error = string.Empty;
                 return true;
@@ -51,7 +54,7 @@ namespace Connector.WS
             var message = new WebSocketCommand()
             {
                 op = "authKeyExpires",
-                args = new object[] { key, EXPIRES, sign }
+                args = new object[] { key, _expires, sign }
             };
             var m = JsonConvert.SerializeObject(message);
             _webSocket.Send(m);
