@@ -39,51 +39,51 @@ namespace Console
 
                 Task.Factory.StartNew(ListenWebSocket);
 
-                var client = new RestApiConnector(_restEndpoint, _key, _secret);
-                var user = client.Connect();
-                if (user.IsSuccess)
-                {
-                    System.Console.WriteLine("Client connected: {0}, {1}", user.FirstName, user.LastName);
-                    System.Console.WriteLine("Trying to set order");
+                //var client = new RestApiConnector(_restEndpoint, _key, _secret);
+                //var user = client.Connect();
+                //if (user.IsSuccess)
+                //{
+                //    System.Console.WriteLine("Client connected: {0}, {1}", user.FirstName, user.LastName);
+                //    System.Console.WriteLine("Trying to set order");
 
-                    // to prevent anti-spam filtering of BitMex
-                    var random = new Random(int.MaxValue);
-                    var priceDivergence = random.Next(1, 10);
-                    var valueSign = priceDivergence % 2 == 0 ? 1 : -1;
-                    var order = new OrderItem
-                    {
-                        side = "Buy",
-                        symbol = _instrument,
-                        orderQty = random.Next(10, 1000),
-                        price = (decimal)(402.2 + priceDivergence * valueSign),
-                        ordType = "Limit"
-                    };
+                //    // to prevent anti-spam filtering of BitMex
+                //    var random = new Random(int.MaxValue);
+                //    var priceDivergence = random.Next(1, 10);
+                //    var valueSign = priceDivergence % 2 == 0 ? 1 : -1;
+                //    var order = new OrderItem
+                //    {
+                //        side = "Buy",
+                //        symbol = _instrument,
+                //        orderQty = random.Next(10, 1000),
+                //        price = (decimal)(402.2 + priceDivergence * valueSign),
+                //        ordType = "Limit"
+                //    };
 
-                    var orderSubmitResult = client.RegisterOrder(order);
-                    if (orderSubmitResult.IsSuccess)
-                    {
-                        System.Console.WriteLine("[REST API][{0}] {1} {2} by {3:#.00} - order sent ({4})", order.side, order.orderQty, order.symbol, order.price, orderSubmitResult.orderID);
-                    }
-                    else
-                    {
-                        System.Console.WriteLine("[REST API]Could not allocate order: {0}", orderSubmitResult.Error);
-                    }
+                //    var orderSubmitResult = client.RegisterOrder(order);
+                //    if (orderSubmitResult.IsSuccess)
+                //    {
+                //        System.Console.WriteLine("[REST API][{0}] {1} {2} by {3:#.00} - order sent ({4})", order.side, order.orderQty, order.symbol, order.price, orderSubmitResult.orderID);
+                //    }
+                //    else
+                //    {
+                //        System.Console.WriteLine("[REST API]Could not allocate order: {0}", orderSubmitResult.Error);
+                //    }
 
-                    var cancelOrderResult = client.CancelOrder(orderSubmitResult.orderID);
-                    if (cancelOrderResult.IsSuccess)
-                    {
-                        System.Console.WriteLine("[REST API]Order {0} cancelled.", orderSubmitResult.orderID);
-                    }
-                    var disconnectionResult = client.Disconnect();
-                    if (disconnectionResult.IsSuccess)
-                    {
-                        System.Console.WriteLine("[REST API]Client {0}, {1} disconnected at {2:T}", user.FirstName, user.LastName, DateTime.Now);
-                    }
-                }
-                else
-                {
-                    System.Console.WriteLine("[API]Connection error: {0}", user.Error);
-                }
+                //    var cancelOrderResult = client.CancelOrder(orderSubmitResult.orderID);
+                //    if (cancelOrderResult.IsSuccess)
+                //    {
+                //        System.Console.WriteLine("[REST API]Order {0} cancelled.", orderSubmitResult.orderID);
+                //    }
+                //    //var disconnectionResult = client.Disconnect();
+                //    //if (disconnectionResult.IsSuccess)
+                //    //{
+                //    //    System.Console.WriteLine("[REST API]Client {0}, {1} disconnected at {2:T}", user.FirstName, user.LastName, DateTime.Now);
+                //    //}
+                //}
+                //else
+                //{
+                //    System.Console.WriteLine("[API]Connection error: {0}", user.Error);
+                //}
             }
             catch (ConfigurationErrorsException e)
             {
@@ -102,7 +102,7 @@ namespace Console
             var wsf = new WebSocketFeed(_wsEndpoint);
             var webSoketChannels = new List<string>
                 {
-                    "trade"
+                    "position"
                 };
             wsf.NewInfoMessage += WebSocketInfoMessage;
             wsf.NewTradeMessage += WebSocketTableMessage;

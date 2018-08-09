@@ -103,7 +103,7 @@ namespace Connector.REST
             {
                 IsJson = json,
                 Method = Enum.GetName(typeof(RestMethod), method),
-                Url = string.Format("{0},{1}", _endpointUri, resource)
+                Url = string.Format("{0}{1}", _endpointUri, resource)
             };
             request.Headers = new Dictionary<string, string>
             {
@@ -127,7 +127,7 @@ namespace Connector.REST
             {
                 IsJson = json,
                 Method = Enum.GetName(typeof(RestMethod), method),
-                Url = string.Format("{0},{1}", _endpointUri, resource)
+                Url = string.Format("{0}{1}", _endpointUri, resource)
             };
             request.Headers = new Dictionary<string, string>
             {

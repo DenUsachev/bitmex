@@ -11,6 +11,8 @@ namespace Connector.WS
     {
         private WebSocket _webSocket;
         private const long EXPIRES = 10;
+        private const string FEED_RESOURCE = "/realtime";
+
         public string ConnectionString { get; set; }
 
         public event EventHandler<InfoResponse> NewInfoMessage;
@@ -26,11 +28,14 @@ namespace Connector.WS
             try
             {
                 var endpointUrl = new Uri(ConnectionString);
-                var sign = HttpHelper.CalculateSignature(endpointUrl, EXPIRES, secret, "GET", endpointUrl.LocalPath);
-                var authrorizedUrl = string.Format("{0}?api-expires={1}&api-signature={2}&api-key={3}", endpointUrl, EXPIRES, sign, key);
-                _webSocket = new WebSocket(authrorizedUrl) { Log = { Level = LogLevel.Error } };
+                var sign = HttpHelper.CalculateSignature(endpointUrl, EXPIRES, secret, "GET", FEED_RESOURCE);
+                //var authrorizedUrl = string.Format("{0}?api-expires={1}&api-signature={2}&api-key={3}", endpointUrl, EXPIRES, sign, key);
+                var authrorizedUrl = string.Format("{0}{1}", ConnectionString, FEED_RESOURCE);
+                _webSocket = new WebSocket(authrorizedUrl) { Log = { Level = LogLevel.Debug } };
                 _webSocket.OnMessage += MessageReceived;
                 _webSocket.Connect();
+                Auth(key, sign);
+
                 error = string.Empty;
                 return true;
             }
@@ -41,9 +46,21 @@ namespace Connector.WS
             }
         }
 
+        private void Auth(string key, string sign)
+        {
+            var message = new WebSocketCommand()
+            {
+                op = "authKeyExpires",
+                args = new object[] { key, EXPIRES, sign }
+            };
+            var m = JsonConvert.SerializeObject(message);
+            _webSocket.Send(m);
+        }
+
         private void MessageReceived(object sender, MessageEventArgs e)
         {
             dynamic jsonData = JsonConvert.DeserializeObject(e.Data);
+            Console.WriteLine(jsonData);
             if (jsonData.action != null && jsonData.action == "partial")
             {
                 return;

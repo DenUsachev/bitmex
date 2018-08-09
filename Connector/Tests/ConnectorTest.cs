@@ -23,7 +23,7 @@ namespace Connector.Tests
             };
         }
 
-        [Order(1), TestCase("Z3So8fRWLaejVhuqKJikSj8B", "malgMjihESAAJrVtzs96ydD1f_m4zoS6YK_vwFFRLitQZzGa")]
+        [Order(1), TestCase("mcklN9Ir8LSimr0cj3vxYMvw", "CP9ieGvkSsk0T55dMnZeG55XEpoYNMFtNNhyl6y7Nih9oFhl")]
         public void Connect(string key, string secret)
         {
             _connector = new RestApiConnector(BITMEX_URL, key, secret);
@@ -32,7 +32,7 @@ namespace Connector.Tests
             Assert.IsNotNull(user.Id, "User id was not fetched");
         }
 
-        [Order(2), TestCase("Z3So8fRWLaejVhuqKJikSj8B", "malgMjihESAAJrVtzs96ydD1f_m4zoS6YK_vwFFRLitQZzGa")]
+        [Order(2), TestCase("mcklN9Ir8LSimr0cj3vxYMvw", "CP9ieGvkSsk0T55dMnZeG55XEpoYNMFtNNhyl6y7Nih9oFhl")]
         public void PlaceOrder(string key, string secret)
         {
             _connector = new RestApiConnector(BITMEX_URL, key, secret);
