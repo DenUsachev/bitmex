@@ -103,20 +103,13 @@ namespace Connector.WS
             {
                 var sourceValue = prop.GetValue(source, null);
                 var targetValue = prop.GetValue(target, null);
-                if (sourceValue != null)
+                if (sourceValue != null && !sourceValue.Equals(0))
                 {
-                    if (targetValue == null || !targetValue.Equals(0))
+                    if (targetValue == null || targetValue.Equals(0))
                     {
                         prop.SetValue(target, sourceValue, null);
                     }
                 }
-                //else
-                //{
-                //    if (targetValue != null && targetValue != (object)0)
-                //    {
-                //        prop.SetValue(target, null, null);
-                //    }
-                //}
             }
         }
 
@@ -159,6 +152,14 @@ namespace Connector.WS
                     {
                         var oldOrder = _orders[order.OrderId];
                         UpdateObject(oldOrder, order);
+                    }
+
+                    if (order.OrdStatus == "Filled")
+                    {
+                        if (_orders.ContainsKey(order.OrderId))
+                        {
+                            _orders.Remove(order.OrderId);
+                        }
                     }
                     OnNewOrderMessage(order);
                 }

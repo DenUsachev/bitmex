@@ -12,7 +12,7 @@ namespace Console
 {
     class Program
     {
-        private static string _instrument = Symbols.Eth;
+        private static string _instrument = Symbols.Bitcoin;
         private static string _restEndpoint;
         private static string _wsEndpoint;
         private static string _secret;
@@ -73,8 +73,8 @@ namespace Console
                     {
                         side = "Buy",
                         symbol = _instrument,
-                        orderQty = random.Next(5, 50),
-                        price = (decimal)(402.2 + priceDivergence * valueSign),
+                        orderQty = random.Next(1, 5),
+                        price = (decimal)(6330 + priceDivergence * valueSign),
                         ordType = "Limit"
                     };
 
