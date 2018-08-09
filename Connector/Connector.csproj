@@ -70,7 +70,9 @@
     <Compile Include="REST\Entities\RestRequest.cs" />
     <Compile Include="REST\Entities\RestResponse.cs" />
     <Compile Include="Tests\ConnectorTest.cs" />
+    <Compile Include="WS\Entities\Order.cs" />
     <Compile Include="WS\Entities\ResponseBase.cs" />
+    <Compile Include="WS\Entities\OrderResponse.cs" />
     <Compile Include="WS\Entities\TradeResponse.cs" />
     <Compile Include="WS\Entities\InfoResponse.cs" />
     <Compile Include="WS\Entities\Trade.cs" />

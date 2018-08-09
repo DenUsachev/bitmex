@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Connector.Extensions;
 using Connector.REST;
 using Connector.WS.Entities;
@@ -18,6 +19,9 @@ namespace Connector.WS
 
         public event EventHandler<InfoResponse> NewInfoMessage;
         public event EventHandler<TradeResponse> NewTradeMessage;
+        public event EventHandler<Order> NewOrderMessage;
+
+        private Dictionary<Guid, Order> _orders;
 
         public WebSocketFeed(string connectionString)
         {
@@ -29,15 +33,14 @@ namespace Connector.WS
             try
             {
                 _expires = DateTime.Now.ToUnixTime() + EXPIRATION_PERIOD;
+                _orders = new Dictionary<Guid, Order>();
 
                 var endpointUrl = new Uri(ConnectionString);
                 var sign = HttpHelper.CalculateSignature(endpointUrl, _expires, secret, "GET", FEED_RESOURCE);
                 var authrorizedUrl = string.Format("{0}realtime?api-expires={1}&api-signature={2}&api-key={3}", endpointUrl, _expires, sign, key);
-                //var authrorizedUrl = string.Format("{0}{1}", ConnectionString, FEED_RESOURCE);
-                _webSocket = new WebSocket(authrorizedUrl) { Log = { Level = LogLevel.Debug } };
+                _webSocket = new WebSocket(authrorizedUrl) { Log = { Level = LogLevel.Error } };
                 _webSocket.OnMessage += MessageReceived;
                 _webSocket.Connect();
-                //Auth(key, sign);
 
                 error = string.Empty;
                 return true;
@@ -46,43 +49,6 @@ namespace Connector.WS
             {
                 error = wex.Message;
                 return false;
-            }
-        }
-
-        private void Auth(string key, string sign)
-        {
-            var message = new WebSocketCommand()
-            {
-                op = "authKeyExpires",
-                args = new object[] { key, _expires, sign }
-            };
-            var m = JsonConvert.SerializeObject(message);
-            _webSocket.Send(m);
-        }
-
-        private void MessageReceived(object sender, MessageEventArgs e)
-        {
-            dynamic jsonData = JsonConvert.DeserializeObject(e.Data);
-            Console.WriteLine(jsonData);
-            if (jsonData.action != null && jsonData.action == "partial")
-            {
-                return;
-            }
-            ResponseBase response;
-            if (jsonData.info != null)
-            {
-                response = new InfoResponse
-                {
-                    Info = jsonData.info,
-                    Version = jsonData.version,
-                    Timestamp = jsonData.time
-                };
-                OnNewInfoMessage((InfoResponse)response);
-            }
-            else if (jsonData.table == "trade")
-            {
-                response = JsonConvert.DeserializeObject<TradeResponse>(jsonData.ToString());
-                OnNewTradeMessage((TradeResponse)response);
             }
         }
 
@@ -121,5 +87,83 @@ namespace Connector.WS
             var handler = NewTradeMessage;
             if (handler != null) handler(this, e);
         }
+
+        protected virtual void OnNewOrderMessage(Order e)
+        {
+            var handler = NewOrderMessage;
+            if (handler != null) handler(this, e);
+        }
+
+
+        private static void UpdateObject<T>(T source, T target) where T : class
+        {
+            var t = typeof(T);
+            var properties = t.GetProperties().Where(prop => prop.CanRead && prop.CanWrite);
+            foreach (var prop in properties)
+            {
+                var sourceValue = prop.GetValue(source, null);
+                var targetValue = prop.GetValue(target, null);
+                if (sourceValue != null)
+                {
+                    if (targetValue == null || !targetValue.Equals(0))
+                    {
+                        prop.SetValue(target, sourceValue, null);
+                    }
+                }
+                //else
+                //{
+                //    if (targetValue != null && targetValue != (object)0)
+                //    {
+                //        prop.SetValue(target, null, null);
+                //    }
+                //}
+            }
+        }
+
+        private void MessageReceived(object sender, MessageEventArgs e)
+        {
+            dynamic jsonData = JsonConvert.DeserializeObject(e.Data);
+            if (jsonData.action != null && jsonData.action == "partial")
+            {
+                return;
+            }
+            ResponseBase response;
+            if (jsonData.info != null)
+            {
+                response = new InfoResponse
+                {
+                    Info = jsonData.info,
+                    Version = jsonData.version,
+                    Timestamp = jsonData.time
+                };
+                OnNewInfoMessage((InfoResponse)response);
+            }
+            else if (jsonData.table == "trade")
+            {
+                response = JsonConvert.DeserializeObject<TradeResponse>(jsonData.ToString());
+                OnNewTradeMessage((TradeResponse)response);
+            }
+            else if (jsonData.table == "order")
+            {
+                var orderResponse = JsonConvert.DeserializeObject<OrderResponse>(jsonData.ToString());
+                foreach (Order order in orderResponse.Data)
+                {
+                    if (order.OrdStatus == "New")
+                    {
+                        if (!_orders.ContainsKey(order.OrderId))
+                        {
+                            _orders.Add(order.OrderId, order);
+                        }
+                    }
+                    else
+                    {
+                        var oldOrder = _orders[order.OrderId];
+                        UpdateObject(oldOrder, order);
+                    }
+                    OnNewOrderMessage(order);
+                }
+            }
+        }
+
     }
 }

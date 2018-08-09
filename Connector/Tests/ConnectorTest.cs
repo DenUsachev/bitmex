@@ -43,19 +43,19 @@ namespace Connector.Tests
             Assert.AreEqual(_order.orderQty, result.orderQty, "Order allocated with bad qty");
             Assert.AreEqual(_order.symbol, result.symbol, "Order allocated with bad instrument");
             Assert.AreEqual(_order.ordType, result.ordType, "Order allocated with bad order type");
-            _order = result;
         }
 
-        [Order(3), TestCase("Z3So8fRWLaejVhuqKJikSj8B", "malgMjihESAAJrVtzs96ydD1f_m4zoS6YK_vwFFRLitQZzGa")]
+        [Order(3), TestCase("mcklN9Ir8LSimr0cj3vxYMvw", "CP9ieGvkSsk0T55dMnZeG55XEpoYNMFtNNhyl6y7Nih9oFhl")]
         public void CancelOrder(string key, string secret)
         {
             _connector = new RestApiConnector(BITMEX_URL, key, secret);
             _connector.Connect();
-            var result = _connector.CancelOrder(_order.orderID);
+            var orderResult = _connector.RegisterOrder(_order);
+            var result = _connector.CancelOrder(orderResult.orderID);
             Assert.True(result.IsSuccess, "Order cancellation failed");
         }
 
-        [Order(4), TestCase("iIFvva629YnJ1LmjEflRfhWA", "QKWRrSRXSBF2sLneIHG118MiBZxAmP5m3L0tel_zYFdPIOvf")]
+        [Order(4), TestCase("mcklN9Ir8LSimr0cj3vxYMvw", "CP9ieGvkSsk0T55dMnZeG55XEpoYNMFtNNhyl6y7Nih9oFhl")]
         public void Disconnect(string key, string secret)
         {
             _connector = new RestApiConnector(BITMEX_URL, key, secret);
