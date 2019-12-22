@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console", "Console\Console.csproj", "{FF1AD15B-69AD-451B-AE58-4E1B0F09A14F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketConnectivity", "MarketConnectivity\MarketConnectivity.csproj", "{FF2B7F5C-DDAC-4003-B345-9D98BAF27A91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Connector", "Connector\Connector.csproj", "{CDCCE652-15D6-489E-A2B2-097E89019F27}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketConnectivity.Tests", "MarketConnectivity.Tests\MarketConnectivity.Tests.csproj", "{892594A3-FFBD-4F05-B652-EEBA4B050C01}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bitmex.Core", "System.Core\Bitmex.Core.csproj", "{37698D65-0206-4FEA-8820-99393221C561}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trading.Core", "Trading.Core\Trading.Core.csproj", "{AC555A17-F804-4C40-BADC-8E73F7626E99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bitmex.Runner", "Bitmex.Runner\Bitmex.Runner.csproj", "{ECC93D34-2142-47DE-9A8D-A46C776467B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,16 +19,51 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FF1AD15B-69AD-451B-AE58-4E1B0F09A14F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF1AD15B-69AD-451B-AE58-4E1B0F09A14F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FF1AD15B-69AD-451B-AE58-4E1B0F09A14F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF1AD15B-69AD-451B-AE58-4E1B0F09A14F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CDCCE652-15D6-489E-A2B2-097E89019F27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CDCCE652-15D6-489E-A2B2-097E89019F27}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CDCCE652-15D6-489E-A2B2-097E89019F27}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CDCCE652-15D6-489E-A2B2-097E89019F27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF2B7F5C-DDAC-4003-B345-9D98BAF27A91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF2B7F5C-DDAC-4003-B345-9D98BAF27A91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF2B7F5C-DDAC-4003-B345-9D98BAF27A91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF2B7F5C-DDAC-4003-B345-9D98BAF27A91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{892594A3-FFBD-4F05-B652-EEBA4B050C01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{892594A3-FFBD-4F05-B652-EEBA4B050C01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{892594A3-FFBD-4F05-B652-EEBA4B050C01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{892594A3-FFBD-4F05-B652-EEBA4B050C01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37698D65-0206-4FEA-8820-99393221C561}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37698D65-0206-4FEA-8820-99393221C561}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37698D65-0206-4FEA-8820-99393221C561}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37698D65-0206-4FEA-8820-99393221C561}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC555A17-F804-4C40-BADC-8E73F7626E99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC555A17-F804-4C40-BADC-8E73F7626E99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC555A17-F804-4C40-BADC-8E73F7626E99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC555A17-F804-4C40-BADC-8E73F7626E99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECC93D34-2142-47DE-9A8D-A46C776467B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECC93D34-2142-47DE-9A8D-A46C776467B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECC93D34-2142-47DE-9A8D-A46C776467B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECC93D34-2142-47DE-9A8D-A46C776467B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
+		$0.TextStylePolicy = $2
+		$2.inheritsSet = null
+		$2.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $3
+		$3.scope = text/x-csharp
+		$0.TextStylePolicy = $4
+		$4.inheritsSet = null
+		$4.scope = application/config+xml
+		$0.XmlFormattingPolicy = $5
+		$5.inheritsSet = null
+		$5.scope = application/config+xml
+		$0.TextStylePolicy = $6
+		$6.inheritsSet = null
+		$6.scope = application/xml
+		$0.XmlFormattingPolicy = $7
+		$7.scope = application/xml
+		$0.StandardHeader = $8
+		$8.Text = @Bitmex trading arbitrage robot \n${FileName} from ${Date} ${Time}\n\n@2019 ${AuthorName}\n\n
 	EndGlobalSection
 EndGlobal

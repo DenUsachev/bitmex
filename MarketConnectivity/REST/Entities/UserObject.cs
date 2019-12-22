@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Connector.REST.Entities
+namespace MarketConnectivity.REST.Entities
 {
     public class UserObject : BaseRestObject
     {

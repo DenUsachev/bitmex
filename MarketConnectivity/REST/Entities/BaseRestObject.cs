@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Connector.REST.Entities
+namespace MarketConnectivity.REST.Entities
 {
     public class BaseRestObject
     {

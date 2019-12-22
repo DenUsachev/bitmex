@@ -1,4 +1,4 @@
-﻿namespace Connector.REST.Entities
+﻿namespace MarketConnectivity.REST.Entities.StaticDefinitions
 {
     public static class Symbols
     {

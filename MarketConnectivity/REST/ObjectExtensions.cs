@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
+<<<<<<< HEAD:Connector/Extensions/ObjectExtensions.cs
 namespace Connector.Extensions
+=======
+namespace MarketConnectivity.REST
+>>>>>>> * Bitmex.Runner.csproj: Projects ported to netcore:MarketConnectivity/REST/ObjectExtensions.cs
 {
     public static class ObjectExtensions
     {

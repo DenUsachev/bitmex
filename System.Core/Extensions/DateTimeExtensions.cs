@@ -1,6 +1,10 @@
 ﻿using System;
 
+<<<<<<< HEAD:Connector/Extensions/DateTimeExtensions.cs
 namespace Connector.Extensions
+=======
+namespace Bitmex.Core.Extensions
+>>>>>>> * Bitmex.Runner.csproj: Projects ported to netcore:System.Core/Extensions/DateTimeExtensions.cs
 {
     public static class DateTimeExtensions
     {

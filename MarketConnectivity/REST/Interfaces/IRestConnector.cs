@@ -1,6 +1,6 @@
-﻿using Connector.REST.Entities;
+﻿using MarketConnectivity.REST.Entities;
 
-namespace Connector.REST.Interfaces
+namespace MarketConnectivity.REST.Interfaces
 {
     public interface IRestConnector
     {
@@ -12,5 +12,6 @@ namespace Connector.REST.Interfaces
         OrderItem RegisterOrder(OrderItem order);
         RestResponse CancelOrder(string orderId, string comment=null);
         object SubscribeOrderbook();
+
     }
 }
